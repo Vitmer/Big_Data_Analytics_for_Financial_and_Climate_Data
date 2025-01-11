@@ -121,4 +121,4 @@ This project is actively evolving. If you'd like to contribute or provide feedba
 3. Share ideas or suggestions in the discussions section.
 
 ---
-
+pip freeze > requirements.txt
