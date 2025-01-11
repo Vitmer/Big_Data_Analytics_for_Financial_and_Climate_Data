@@ -1,14 +1,13 @@
 import boto3
-from confluent_kafka import Producer, Consumer, KafkaException
+from confluent_kafka import Producer, Consumer
 import json
-import os
 
 class StreamHandler:
     def __init__(self, system, config):
         """
-        Initialize the stream handler for Kafka or Kinesis.
-        
-        :param system: 'kafka' or 'kinesis'
+        Initialize the stream handler for Kafka, Kinesis, or Azure Event Hubs.
+
+        :param system: 'kafka', 'kinesis', or 'eventhubs'
         :param config: Dictionary containing configuration for the selected system
         """
         self.system = system
@@ -21,18 +20,17 @@ class StreamHandler:
                 'auto.offset.reset': config['auto.offset.reset']
             })
         elif system == "kinesis":
-            self.client = boto3.client(
-                "kinesis",
-                region_name=config["region"]
-            )
+            self.client = boto3.client("kinesis", region_name=config["region"])
+        elif system == "eventhubs":
+            self.events = []  # Mock storage for Azure Event Hubs messages
         else:
-            raise ValueError("Unsupported system. Use 'kafka' or 'kinesis'.")
+            raise ValueError("Unsupported system. Use 'kafka', 'kinesis', or 'eventhubs'.")
 
     def send(self, topic_or_stream, data):
         """
-        Send data to Kafka or Kinesis.
-        
-        :param topic_or_stream: Kafka topic or Kinesis stream name
+        Send data to Kafka, Kinesis, or Event Hubs.
+
+        :param topic_or_stream: Kafka topic, Kinesis stream name, or Event Hubs stream name
         :param data: Data to send (as a dictionary)
         """
         if self.system == "kafka":
@@ -46,12 +44,16 @@ class StreamHandler:
                 PartitionKey="partition_key"
             )
             print(f"Sent to Kinesis stream {topic_or_stream}: {data}")
+        elif self.system == "eventhubs":
+            # Append to mock event storage
+            self.events.append({"stream": topic_or_stream, "data": data})
+            print(f"Mock sent to Event Hubs stream {topic_or_stream}: {data}")
 
     def consume(self, topic_or_stream):
         """
-        Consume data from Kafka or Kinesis.
-        
-        :param topic_or_stream: Kafka topic or Kinesis stream name
+        Consume data from Kafka, Kinesis, or Event Hubs.
+
+        :param topic_or_stream: Kafka topic, Kinesis stream name, or Event Hubs stream name
         """
         if self.system == "kafka":
             self.consumer.subscribe([topic_or_stream])
@@ -79,6 +81,11 @@ class StreamHandler:
                 for record in records_response["Records"]:
                     yield json.loads(record["Data"])
                 shard_iterator = records_response["NextShardIterator"]
+        elif self.system == "eventhubs":
+            # Simulate reading from the mock event storage
+            for event in self.events:
+                if event["stream"] == topic_or_stream:
+                    yield event["data"]
 
     def close(self):
         """Close the Kafka consumer if used."""
