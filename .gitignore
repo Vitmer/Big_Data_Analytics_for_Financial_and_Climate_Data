@@ -1,0 +1,46 @@
+# Python-specific
+__pycache__/
+*.py[cod]
+*.sqlite3
+logs/
+.env
+# Virtual environments
+venv/
+
+# Игнорируем пользовательские данные и системные файлы
+.DS_Store
+.Trash/
+*.log
+*.sqlite_history
+*.pyc
+__pycache__/
+*.ipynb_checkpoints
+*.idea/
+*.vscode/
+
+# Игнорируем конфигурации и скрытые файлы
+.*/*
+
+# Игнорировать домашнюю директорию и пользовательские настройки
+../../../*
+
+# Игнорировать временные файлы и системные директории
+*.DS_Store
+*.RData
+*.Rhistory
+*.sqlite_history
+*.pyenv
+*.python_history
+*.zsh_history
+*.zcompdump
+*.zsh_sessions/
+*.log
+*.bak
+.vscode/
+.ipynb_checkpoints/
+.cache/
+.config/
+.local/
+.mypy_cache/
+venv/
+*.iso
